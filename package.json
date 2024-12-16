@@ -1,0 +1,26 @@
+{
+  "name": "house-listing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "nodemon src/index.js",
+    "dev": "nodemon src/index.js",
+    "final": "nodemon final/index.js",
+    "seed": "node final/util/seed/index.js",
+    "lint": "eslint \"src/**/*.js\""
+  },
+  "dependencies": {
+    "apollo-server-express": "^3.13.0",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "graphql-depth-limit": "^1.1.0",
+    "graphql-validation-complexity": "^0.4.2",
+    "house-listing": "file:",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.0",
+    "nodemon": "^3.1.9"
+  }
+}
