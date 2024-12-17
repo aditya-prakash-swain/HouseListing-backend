@@ -10,6 +10,7 @@ const houseSchema = new mongoose.Schema({
     },
     price: {
         type: Number,
+        default: 0,
         required: true,
     },
     location: {
@@ -20,19 +21,21 @@ const houseSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    images: [{
-        type: String,
-    }],
+    images: [
+        {
+            type: String,
+        }
+    ],
     owner: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        type: String,// change to user
         required: true,
     },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
-});
+
+},
+    {
+        timestamps: true,
+    }
+);
 
 const House = mongoose.model('House', houseSchema);
 // Export the module
