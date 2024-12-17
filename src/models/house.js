@@ -27,7 +27,8 @@ const houseSchema = new mongoose.Schema({
         }
     ],
     owner: {
-        type: String,// change to user
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true,
     },
 
