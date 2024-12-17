@@ -36,7 +36,50 @@ module.exports = {
         }
     },
 
-    
+    register: async (parent, { username, email, password }, { models }) => {
+        email = email.trim().toLowerCase()
+
+        const hashed = await bcrypt.hash(password, 10);
+
+        try {
+            //user is created
+            const user = await models.User.create({
+                username,
+                email,
+                password: hashed
+            });
+
+            // create and return the json web token
+            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET,);
+
+            //returns user info along with token
+            return { ...user._doc, id: user._id, token, };
+        } catch (err) {
+            // if there's a problem creating the account, throw an error
+            throw new Error(err);
+        }
+    },
+
+    login: async (parent, { email, password }, { models }) => {
+        if (email) { email = email.trim().toLowerCase(); }
+
+        const user = await models.User.findOne({ email });
+
+        if (!user) {
+            throw new AuthenticationError('User not found');
+        }
+
+        const isValidPassword = await bcrypt.compare(password, user.password);
+        if (!isValidPassword) {
+            throw new AuthenticationError('Invalid Password');
+        }
+
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+        return { ...user._doc, id: user._id, token, };
+
+    }
+
+
 
 
 }
