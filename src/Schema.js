@@ -31,6 +31,7 @@ type Query {
     getHouses(location: String, priceRange: [Float!], houseType: String): [House!] 
     getHouseById(houseId: ID!): House 
     getUserListings(userId: ID!): [House!] 
+    getBookedHouses(userId:ID!): [House!]
 } 
 type Mutation { 
     register(username: String!, email: String!, password: String!): User 

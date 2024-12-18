@@ -29,7 +29,7 @@ module.exports = {
 
     },
 
-    deleteHouse: async (parent, { houseId }, { models,user }) => {
+    deleteHouse: async (parent, { houseId }, { models, user }) => {
 
         if (!user) {
             throw new AuthenticationError('You must be signed in to delete a note');
@@ -38,7 +38,7 @@ module.exports = {
         const house = await models.House.findById(houseId);
 
         console.log("done2")
-        if(house && String(house.owner)!==user.id){
+        if (house && String(house.owner) !== user.id) {
             throw new ForbiddenError("You don't have permissions to delete the note");
         }
 
@@ -92,7 +92,40 @@ module.exports = {
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
         return { ...user._doc, id: user._id, token, };
 
-    }
+    },
+
+    bookHouse: async (parent, { houseId, userId }, { models }) => {
+        try {
+            // Validate the house and user exist (optional but recommended)
+            const house = await models.House.findById(houseId);
+            if (!house) {
+                throw new Error('House not found');
+            }
+            const user = await models.User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
+
+            // Create a new booking
+            const booking = new models.Booking({
+                house: houseId,
+                user: userId,
+                bookingDate: new Date(), // Booking date is set to the current time
+                status: 'confirmed',      // Default status
+            });
+
+            // Save the booking to the database
+            const savedBooking = await booking.save();
+
+            // Populate the booking with house and user details before returning
+            const populatedBooking = await models.Booking.findById(booking._id)
+            .populate('house')
+            .populate('user');
+            return populatedBooking;
+        } catch (error) {
+            throw new Error(error);
+        }
+    },
 
 
 
