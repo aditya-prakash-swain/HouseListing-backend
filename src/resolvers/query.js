@@ -1,4 +1,3 @@
-const { model } = require("mongoose");
 
 module.exports = {
   getHouses: async (parent, { location, priceRange, houseType }, { models }) => {

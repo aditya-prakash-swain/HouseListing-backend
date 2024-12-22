@@ -16,7 +16,7 @@ module.exports = {
         }
 
         // Create a new house object
-        return await models.House.create({
+        const newHouse = await models.House.create({
             title,
             description, // Default to empty string if null
             price,
@@ -26,6 +26,13 @@ module.exports = {
             owner: new mongoose.Types.ObjectId(user.id)
         });
 
+        await models.User.findByIdAndUpdate(
+            user.id,
+            { $push: { listings: newHouse._id } }, // Add the new house to the user's listings
+            { new: true } // Return the updated user object
+        );
+
+        return newHouse;
 
     },
 
@@ -44,6 +51,11 @@ module.exports = {
 
         try {
             await house.deleteOne();
+            await models.User.findByIdAndUpdate(
+                user.id,
+                { $pull: { listings: houseId } }, // Remove the house ID from the user's listings array
+                { new: true }
+            );
             console.log("House removed successfully");
             return true;
         } catch (err) {
@@ -51,7 +63,11 @@ module.exports = {
         }
     },
 
-    register: async (parent, { username, email, password }, { models }) => {
+    register: async (parent, { username, email, password, role }, { models }) => {
+        const existingUser = await models.User.findOne({ email });
+        if (existingUser) {
+            throw new Error("User with this email already exists.");
+        }
         email = email.trim().toLowerCase()
 
         const hashed = await bcrypt.hash(password, 10);
@@ -61,7 +77,8 @@ module.exports = {
             const user = await models.User.create({
                 username,
                 email,
-                password: hashed
+                password: hashed,
+                role
             });
 
             // create and return the json web token
@@ -94,7 +111,7 @@ module.exports = {
 
     },
 
-    bookHouse: async (parent, { houseId, userId }, { models }) => {
+    bookHouse: async (parent, { houseId, userId }, { user, models }) => {
         try {
             // Validate the house and user exist (optional but recommended)
             const house = await models.House.findById(houseId);
@@ -119,8 +136,8 @@ module.exports = {
 
             // Populate the booking with house and user details before returning
             const populatedBooking = await models.Booking.findById(booking._id)
-            .populate('house')
-            .populate('user');
+                .populate('house')
+                .populate('user');
             return populatedBooking;
         } catch (error) {
             throw new Error(error);

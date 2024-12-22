@@ -17,6 +17,7 @@ type User {
     id: ID! 
     username: String! 
     email: String! 
+    role: String!
     token: String 
     listings: [House!] 
 } 
@@ -34,7 +35,7 @@ type Query {
     getBookedHouses(userId:ID!): [House!]
 } 
 type Mutation { 
-    register(username: String!, email: String!, password: String!): User 
+    register(username: String!, email: String!, password: String!, role: String!): User 
     login(email: String!, password: String!): User 
     addHouse( 
         title: String!, 
